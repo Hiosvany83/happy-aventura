@@ -1,0 +1,17 @@
+name: Renombrar v0.7 a index.html
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rename:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Renombrar index-single.html a index.html
+        run: |
+          git config user.name "Hiosvany83"
+          git config user.email "Hiosvany83@users.noreply.github.com"
+          git mv index-single.html index.html
+          git commit -m "Update to v0.7: rename index-single.html to index.html"
+          git push
