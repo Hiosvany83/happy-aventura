@@ -20,7 +20,7 @@
 <script>
 'use strict';
 /* ============================================================
-   HaPpy Energy: La Aventura de Energilandia — v0.5.1 MUNDO ABIERTO
+   HaPpy Energy: La Aventura de Energilandia — v0.5.2 MUNDO ABIERTO
    Explora Energilandia a tu ritmo: colinas de césped, árboles,
    criaturas que deambulan, Nublados que sueltan energía al
    purificarlos y el Gran Mango esperando al final del valle.
@@ -128,9 +128,9 @@ const TOTAL_STARS=stars.filter(s=>s.type==='star').length,TOTAL_GOLD=3;
 const ENERGY_MAX=100;
 const MANGO_X=WORLD_W-300;
 const checkX=[150,2050,3650,5050];
-const NUBLADO_X=[520,980,1420,1980,2440,2980,3420,3980,4460,4920,5380,5680];
+const NUBLADO_X=[520,980,1420,1980,2780,2980,3420,3760,4460,4920,5380,5680];
 const POMPON_X=[350,1250,1750,2650,3250,4250,4750,5450];
-const GRUMO_X=[760,2150,3350,4180,4780,5560];
+const GRUMO_X=[760,2590,3350,4180,4780,5560];
 const GRAJO_X=[1120,2680,3780,4680,5300];
 const ENEMY_TOTAL=NUBLADO_X.length+GRUMO_X.length+GRAJO_X.length;
 const PAGE_TEXTS=[
@@ -276,6 +276,7 @@ function update(){
       if(dist<215&&P.dead===0)c.vx=(dx>0?0.95:-0.95);
       else if(Math.random()<0.004)c.vx*=-1;
       c.x+=c.vx;
+      for(const nx of [2300,4000]){const dd=(c.x+c.w/2)-nx;if(Math.abs(dd)<175){c.x+=dd>0?2.4:-2.4;c.vx=Math.abs(c.vx)*(dd>0?1:-1);}}
       if(c.x<10){c.x=10;c.vx=Math.abs(c.vx);}
       if(c.x>WORLD_W-c.w-10){c.x=WORLD_W-c.w-10;c.vx=-Math.abs(c.vx);}
       c.y=groundH(ccx)-c.h-16+Math.sin(frame*0.05+c.ph)*6;
@@ -289,6 +290,7 @@ function update(){
       const dx=(P.x+P.w/2)-ccx;
       if(Math.abs(dx)<240&&P.dead===0)c.vx=(dx>0?1.15:-1.15);
       c.x+=c.vx;c.y+=c.vy;
+      for(const nx of [2300,4000]){const dd=(c.x+c.w/2)-nx;if(Math.abs(dd)<175){c.x+=dd>0?2.4:-2.4;c.vx=Math.abs(c.vx)*(dd>0?1:-1);}}
       const cg=groundH(ccx);
       if(c.y+c.h>=cg){c.y=cg-c.h;c.vy=0;}
       if(c.x<10)c.vx=Math.abs(c.vx);if(c.x>WORLD_W-c.w-10)c.vx=-Math.abs(c.vx);
@@ -307,11 +309,13 @@ function update(){
         if(c.x>c.ax+150)c.vx=-1.1;if(c.x<c.ax-150)c.vx=1.1;
         c.y+=(gy-c.y)*0.06;
         const dx=(P.x+P.w/2)-ccx;
-        if(Math.abs(dx)<225&&P.y>groundH(P.x+P.w/2)-190&&P.dead===0){c.mode='picado';c.t=0;c.vx=dx>0?3.4:-3.4;c.vy=2.6;}
+        const enClaro=(Math.abs((P.x+P.w/2)-2300)<175||Math.abs((P.x+P.w/2)-4000)<175);
+        if(Math.abs(dx)<225&&P.y>groundH(P.x+P.w/2)-190&&P.dead===0&&!enClaro){c.mode='picado';c.t=0;c.vx=dx>0?3.4:-3.4;c.vy=2.6;}
       }else{
         c.x+=c.vx;c.y+=c.vy;
         if(c.t>52){c.mode='patrulla';c.t=0;}
       }
+      for(const nx of [2300,4000]){const dd=(c.x+c.w/2)-nx;if(Math.abs(dd)<175){c.x+=dd>0?3.2:-3.2;if(c.mode==='picado'){c.mode='patrulla';c.t=0;}}}
       if(c.x<10)c.x=10;if(c.x>WORLD_W-c.w-10)c.x=WORLD_W-c.w-10;
       if(c.y<30)c.y=30;const cg2=groundH(ccx)-c.h-4;if(c.y>cg2)c.y=cg2;
       if(P.dead===0&&overlap(P,c)){
