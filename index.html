@@ -20,7 +20,7 @@
 <script>
 'use strict';
 /* ============================================================
-   HaPpy Energy: La Aventura de Energilandia — v0.5 MUNDO ABIERTO
+   HaPpy Energy: La Aventura de Energilandia — v0.5.1 MUNDO ABIERTO
    Explora Energilandia a tu ritmo: colinas de césped, árboles,
    criaturas que deambulan, Nublados que sueltan energía al
    purificarlos y el Gran Mango esperando al final del valle.
@@ -418,16 +418,31 @@ function drawWorldTo(g){
   const x0=cam.x-40,x1=cam.x+W+40;
   // árboles (detrás del suelo, plantados en las colinas)
   for(const t of trees){if(t.x<x0-200||t.x>x1+200)continue;drawSprite(g,IMG.arbol,t.x,groundH(t.x)+8,t.h,t.flip,0,0.96);}
-  // suelo: tierra
-  g.beginPath();g.moveTo(x0,H);
-  for(let x=x0;x<=x1;x+=12)g.lineTo(x,groundH(x));
-  g.lineTo(x1,H);g.closePath();
-  g.fillStyle=mixc('#5d5648','#6d4c41',r);g.fill();
-  // textura de la tierra
-  g.fillStyle='rgba(0,0,0,0.13)';
-  for(let x=Math.floor(x0/46)*46;x<x1;x+=46){const yy=groundH(x)+22+((x*29)%52);g.fillRect(x+((x*13)%20),yy,7,5);}
-  g.fillStyle='rgba(255,255,255,0.07)';
-  for(let x=Math.floor(x0/46)*46+23;x<x1;x+=46){const yy=groundH(x)+34+((x*41)%60);g.fillRect(x,yy,6,4);}
+  // suelo: estratos de tierra que siguen las colinas
+  const strata=[[0,26,'#57503f','#5f4630'],[26,84,'#50483c','#75562f'],[84,10000,'#453f38','#5d4a33']];
+  for(const st4 of strata){
+    g.beginPath();
+    for(let x=x0;x<=x1;x+=12){const y=groundH(x)+st4[0];x===x0?g.moveTo(x,y):g.lineTo(x,y);}
+    for(let x=x1;x>=x0;x-=12)g.lineTo(x,Math.min(H+4,groundH(x)+st4[1]));
+    g.closePath();g.fillStyle=mixc(st4[2],st4[3],r);g.fill();
+  }
+  // guijarros repartidos por la tierra
+  for(let x=Math.floor(x0/38)*38;x<x1;x+=38){
+    const yy=groundH(x)+14+((x*31)%150);
+    if(yy<H-4){g.fillStyle=((x*7)%3===0)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.16)';
+      g.beginPath();g.ellipse(x+((x*13)%18),yy,4+((x*17)%4),3,0,0,7);g.fill();}
+  }
+  // raíces que cuelgan bajo el césped
+  g.strokeStyle=mixc('#4c463c','#4e6b2f',r);g.lineWidth=2;
+  g.beginPath();
+  for(let x=Math.floor(x0/64)*64+20;x<x1;x+=64){const y=groundH(x);g.moveTo(x,y+4);g.quadraticCurveTo(x+3,y+13,x+((x*11)%9)-4,y+20+((x*7)%8));}
+  g.stroke();
+  // piedras grandes en la capa profunda
+  for(let x=Math.floor(x0/210)*210+90;x<x1;x+=210){
+    const yy=groundH(x)+105+((x*19)%40);
+    if(yy<H-10){g.fillStyle=mixc('#5b564d','#6e6257',r);g.beginPath();g.ellipse(x,yy,13,9,0.3,0,7);g.fill();
+      g.fillStyle='rgba(255,255,255,0.10)';g.beginPath();g.ellipse(x-4,yy-3,5,3,0.3,0,7);g.fill();}
+  }
   // banda de césped
   g.beginPath();for(let x=x0;x<=x1;x+=12){const y=groundH(x);x===x0?g.moveTo(x,y):g.lineTo(x,y);}
   g.strokeStyle=mixc('#757a72','#3f9e4d',r);g.lineWidth=15;g.lineCap='round';g.stroke();
